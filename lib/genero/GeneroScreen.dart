@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:proyecto/screens/Trailer.dart';
 import 'package:proyecto/screens/tmdb_service.dart';
-import 'package:proyecto/widgets/Mydrawer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:proyecto/styles/styles.dart';
-import 'package:youtube_player_flutter/youtube_player_flutter.dart'; // Para el trailer embebido
+import 'package:proyecto/widgets/Mydrawer.dart';
+import 'package:proyecto/screens/Trailer.dart'; 
 
-class Inicio extends StatefulWidget {
+class GeneroScreen extends StatefulWidget {
+  final String titulo;
+  final int genreId;
+
+  const GeneroScreen({required this.titulo, required this.genreId});
+
   @override
-  _InicioState createState() => _InicioState();
+  _GeneroScreenState createState() => _GeneroScreenState();
 }
 
-class _InicioState extends State<Inicio> {
+class _GeneroScreenState extends State<GeneroScreen> {
   List<dynamic> peliculas = [];
   bool isLoading = true;
 
@@ -24,7 +28,7 @@ class _InicioState extends State<Inicio> {
   void cargarPeliculas() async {
     final servicio = TMDBService();
     try {
-      final resultado = await servicio.getPopularMovies();
+      final resultado = await servicio.getMoviesByGenre(widget.genreId);
       setState(() {
         peliculas = resultado;
         isLoading = false;
@@ -37,74 +41,73 @@ class _InicioState extends State<Inicio> {
     }
   }
 
-void mostrarDialogoPelicula(Map<String, dynamic> pelicula) async {
-  final titulo = pelicula['title'] ?? 'Sin título';
-  final descripcion = pelicula['overview'] ?? 'Sin descripción';
+  void mostrarDialogoPelicula(Map<String, dynamic> pelicula) async {
+    final titulo = pelicula['title'] ?? 'Sin título';
+    final descripcion = pelicula['overview'] ?? 'Sin descripción';
 
-  showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      backgroundColor: AppColors.inputFill,
-      title: Text(titulo, style: AppTextStyles.subtitle),
-      content: Text(descripcion, style: AppTextStyles.subtitle),
-      actions: [
-        TextButton(
-          onPressed: () async {
-            final tmdbService = TMDBService();
-            final trailerUrl = await tmdbService.getTrailerYoutubeUrl(pelicula['id']);
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: AppColors.inputFill,
+        title: Text(titulo, style: AppTextStyles.subtitle),
+        content: Text(descripcion, style: AppTextStyles.subtitle),
+        actions: [
+          TextButton(
+            onPressed: () async {
+              final tmdbService = TMDBService();
+              final trailerUrl = await tmdbService.getTrailerYoutubeUrl(pelicula['id']);
 
-            if (trailerUrl != null) {
-              Navigator.pop(context); // Cierra el diálogo aquí
-              if (!mounted) return;
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => Trailer(
-                    titulo: titulo,
-                    descripcion: descripcion,
-                    generos: [], // agrega tus géneros si quieres
-                    youtubeUrl: trailerUrl,
+              if (trailerUrl != null) {
+                Navigator.pop(context); // Cierra el diálogo
+                if (!mounted) return;
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => Trailer(
+                      titulo: titulo,
+                      descripcion: descripcion,
+                      generos: [], // Puedes agregar géneros si tienes
+                      youtubeUrl: trailerUrl,
+                    ),
                   ),
-                ),
-              );
-            } else {
-              showDialog(
-                context: context,
-                builder: (_) => AlertDialog(
-                  title: Text("Trailer no disponible"),
-                  content: Text("No se encontró trailer para esta película."),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text("Cerrar"),
-                    )
-                  ],
-                ),
-              );
-            }
-          },
-          child: Text("Ver Trailer", style: AppTextStyles.link),
-        ),
-        ElevatedButton(
-          style: AppButtonStyle.yellowButton,
-          onPressed: () {
-            Navigator.pop(context);
-            // lógica de Ver Ahora
-          },
-          child: Text("Ver Ahora"),
-        ),
-      ],
-    ),
-  );
-}
-
+                );
+              } else {
+                showDialog(
+                  context: context,
+                  builder: (_) => AlertDialog(
+                    title: Text("Trailer no disponible"),
+                    content: Text("No se encontró trailer para esta película."),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(context),
+                        child: Text("Cerrar"),
+                      )
+                    ],
+                  ),
+                );
+              }
+            },
+            child: Text("Ver Trailer", style: AppTextStyles.link),
+          ),
+          ElevatedButton(
+            style: AppButtonStyle.yellowButton,
+            onPressed: () {
+              Navigator.pop(context);
+              // lógica de Ver Ahora (opcional)
+            },
+            child: Text("Ver Ahora"),
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
       appBar: AppBar(
-        title: Text('Catálogo de Películas', style: AppTextStyles.subtitle),
+        title: Text(widget.titulo, style: AppTextStyles.subtitle),
         backgroundColor: AppColors.inputFill,
         iconTheme: IconThemeData(color: AppColors.textWhite),
       ),
@@ -141,30 +144,22 @@ void mostrarDialogoPelicula(Map<String, dynamic> pelicula) async {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(
-                            child: Stack(
-                              children: [
-                                if (posterPath != null)
-                                  CachedNetworkImage(
+                            child: posterPath != null
+                                ? CachedNetworkImage(
                                     imageUrl: 'https://image.tmdb.org/t/p/w500$posterPath',
                                     fit: BoxFit.cover,
                                     width: double.infinity,
-                                    placeholder: (context, url) => Center(
-                                        child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            color: AppColors.primaryYellow)),
+                                    placeholder: (context, url) =>
+                                        Center(child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primaryYellow)),
                                     errorWidget: (context, url, error) =>
                                         Icon(Icons.error, color: AppColors.textWhite),
                                   )
-                                else
-                                  Container(
+                                : Container(
                                     color: Colors.grey[300],
                                     child: Center(
-                                      child: Icon(Icons.movie,
-                                          size: 50, color: Colors.grey[600]),
+                                      child: Icon(Icons.movie, size: 50, color: Colors.grey[600]),
                                     ),
                                   ),
-                              ],
-                            ),
                           ),
                           Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -180,10 +175,7 @@ void mostrarDialogoPelicula(Map<String, dynamic> pelicula) async {
                               padding: const EdgeInsets.symmetric(horizontal: 8.0),
                               child: Text(
                                 releaseDate,
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: AppColors.textGrey,
-                                ),
+                                style: TextStyle(fontSize: 12, color: AppColors.textGrey),
                               ),
                             ),
                         ],
