@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:proyecto/screens/Inicio.dart';
-import '../styles/styles.dart';
-
-// AUTENTICACIÓN
+import 'package:proyecto/screens/MenorEdad.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_database/firebase_database.dart';
+import '../styles/styles.dart';
 
 class Login extends StatelessWidget {
   final VoidCallback onBack;
@@ -28,12 +28,10 @@ class Login extends StatelessWidget {
               child: const Text("Regresar", style: AppTextStyles.link),
             ),
           ),
-
           Center(
             child: SingleChildScrollView(
               child: Column(
-                mainAxisSize:
-                    MainAxisSize.min, 
+                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   const Text('Iniciar Sesión', style: AppTextStyles.formTitle),
@@ -73,29 +71,55 @@ class Login extends StatelessWidget {
   }
 }
 
-
-Future<void> ingresar(correo, contrasenia,context) async {
+Future<void> ingresar(String correo, String contrasenia, BuildContext context) async {
   try {
-  final credential = await FirebaseAuth.instance.signInWithEmailAndPassword(
-    email: correo,
-    password: contrasenia
-  );
+    // 1. Iniciar sesión con Firebase Auth
+    final cred = await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: correo,
+      password: contrasenia,
+    );
 
-Navigator.push(context, MaterialPageRoute(builder: (context) => Inicio(),));
+    final user = cred.user;
+    if (user == null) throw Exception('Usuario no válido');
 
+    final uid = user.uid;
 
-} on FirebaseAuthException catch (e) {
-  if (e.code == 'user-not-found') {
-    print('No user found for that email.');
-  } else if (e.code == 'wrong-password') {
-    print('Wrong password provided for that user.');
+    // 2. Leer edad desde Realtime Database
+    final ref = FirebaseDatabase.instance.ref("usuarios/$uid/edad");
+    final snapshot = await ref.get();
+
+    if (!snapshot.exists) {
+      throw Exception("Edad no encontrada en el perfil.");
+    }
+
+    final edadStr = snapshot.value.toString();
+    final edad = int.tryParse(edadStr);
+
+    if (edad == null) {
+      throw Exception("Edad inválida en el perfil.");
+    }
+
+    // 3. Redireccionar según la edad
+    if (edad < 18) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => MenorEdad()),
+      );
+    } else {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => Inicio()),
+      );
+    }
+  } on FirebaseAuthException catch (e) {
+    String mensaje = 'Error de autenticación.';
+    if (e.code == 'user-not-found') {
+      mensaje = 'No existe un usuario con ese correo.';
+    } else if (e.code == 'wrong-password') {
+      mensaje = 'La contraseña es incorrecta.';
+    }
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(mensaje)));
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
   }
 }
-  
-}
-
-// pendiente 
-// hacer que se borre los datos una vez presionado el boton 
-// boton regresar a donde direcciona
-// subir imagenes
-// 

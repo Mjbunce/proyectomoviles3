@@ -25,20 +25,20 @@ class _TrailerScreenState extends State<Trailer> {
 
   @override
   void initState() {
-    final videoId = YoutubePlayer.convertUrlToId(widget.youtubeUrl);
+    super.initState();
+    final videoId = YoutubePlayer.convertUrlToId(widget.youtubeUrl) ?? '';
     _controller = YoutubePlayerController(
-      initialVideoId: videoId ?? '',
+      initialVideoId: videoId,
       flags: const YoutubePlayerFlags(
         autoPlay: false,
         mute: false,
       ),
     );
-    super.initState();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller.dispose(); 
     super.dispose();
   }
 
@@ -48,7 +48,7 @@ class _TrailerScreenState extends State<Trailer> {
       await launchUrl(url, mode: LaunchMode.externalApplication);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('No se pudo abrir YouTube')),
+        const SnackBar(content: Text('No se pudo abrir YouTube')),
       );
     }
   }
@@ -75,19 +75,21 @@ class _TrailerScreenState extends State<Trailer> {
               Text("Géneros:", style: AppTextStyles.formTitle.copyWith(fontSize: 18)),
               Wrap(
                 spacing: 8,
-                children: widget.generos
-                    .map((g) => Chip(label: Text(g)))
-                    .toList(),
+                children: widget.generos.map((g) => Chip(label: Text(g))).toList(),
               ),
               const SizedBox(height: 20),
-              YoutubePlayer(
-                controller: _controller,
-                showVideoProgressIndicator: true,
+
+              YoutubePlayerBuilder(
+                player: YoutubePlayer(controller: _controller, showVideoProgressIndicator: true),
+                builder: (context, player) {
+                  return player;
+                },
               ),
+
               const SizedBox(height: 20),
               ElevatedButton.icon(
-                icon: Icon(Icons.open_in_new),
-                label: Text('Abrir en YouTube'),
+                icon: const Icon(Icons.open_in_new),
+                label: const Text('Abrir en YouTube'),
                 style: AppButtonStyle.yellowButton,
                 onPressed: _launchYoutube,
               ),

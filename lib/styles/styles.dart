@@ -11,29 +11,29 @@ class AppColors {
 class AppTextStyles {
   static const TextStyle title = TextStyle(
     color: AppColors.textWhite,
-    fontSize: 48,
+    fontSize: 50,
     fontWeight: FontWeight.bold,
   );
 
   static const TextStyle subtitle = TextStyle(
     color: AppColors.textGrey,
-    fontSize: 20,
+    fontSize: 15,
   );
 
   static const TextStyle button = TextStyle(
     color: Colors.black,
-    fontSize: 18,
+    fontSize: 15,
   );
 
   static const TextStyle link = TextStyle(
     color: AppColors.primaryYellow,
     decoration: TextDecoration.underline,
-    fontSize: 16,
+    fontSize: 15,
   );
 
   static const TextStyle formTitle = TextStyle(
     color: AppColors.textWhite,
-    fontSize: 32,
+    fontSize: 14,
     fontWeight: FontWeight.bold,
   );
 }
@@ -55,7 +55,7 @@ class AppDecorations {
 class AppButtonStyle {
   static ButtonStyle yellowButton = ElevatedButton.styleFrom(
     backgroundColor: AppColors.primaryYellow,
-    padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8), // estaba 24 / 16
     textStyle: AppTextStyles.button,
   );
 }

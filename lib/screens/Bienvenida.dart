@@ -10,7 +10,7 @@ class Bienvenida extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: AppColors.background,
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(18),
       child: Row(
         children: [
           // Parte izquierda con texto y botones
@@ -22,7 +22,7 @@ class Bienvenida extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const Text("SpotMovie", style: AppTextStyles.title),
-                const SizedBox(height: 12),
+                const SizedBox(height: 20),
                 const Text(
                   "Explora, mira y disfruta",
                   style: AppTextStyles.subtitle,
@@ -31,17 +31,33 @@ class Bienvenida extends StatelessWidget {
 
                 // Botones amarillo patito
                 ElevatedButton.icon(
-                  style: AppButtonStyle.yellowButton,
+                  style: AppButtonStyle.yellowButton.copyWith(
+                    padding: MaterialStateProperty.all<EdgeInsets>(
+                      EdgeInsets.symmetric(vertical: 8, horizontal: 20), // Ajuste de padding
+                    ),
+                    minimumSize: MaterialStateProperty.all<Size>(Size(130, 40)), // Tamaño mínimo
+                  ),
                   onPressed: () => onNavigate(1), // Página login
                   icon: const Icon(Icons.login, color: Colors.black),
-                  label: const Text("Inicio de sesión"),
+                  label: const Text(
+                    "Ingreso",
+                    style: TextStyle(fontSize: 14), // Reducción de tamaño de texto
+                  ),
                 ),
                 const SizedBox(height: 16),
                 ElevatedButton.icon(
-                  style: AppButtonStyle.yellowButton,
+                  style: AppButtonStyle.yellowButton.copyWith(
+                    padding: MaterialStateProperty.all<EdgeInsets>(
+                      EdgeInsets.symmetric(vertical: 8, horizontal: 20), // Ajuste de padding
+                    ),
+                    minimumSize: MaterialStateProperty.all<Size>(Size(130, 40)), // Tamaño mínimo
+                  ),
                   onPressed: () => onNavigate(2), // Página registro
                   icon: const Icon(Icons.person_add, color: Colors.black),
-                  label: const Text("Crear cuenta"),
+                  label: const Text(
+                    "Crear cuenta",
+                    style: TextStyle(fontSize: 14), // Reducción de tamaño de texto
+                  ),
                 ),
               ],
             ),
@@ -50,12 +66,12 @@ class Bienvenida extends StatelessWidget {
           Expanded(
             flex: 1,
             child: Container(
-              width: 750,
-              height: 750,
+              width: 650,
+              height: 650,
               color: Colors.transparent,
               child: Image.asset(
-                'assets/imagenes/fondo.png', // Asegúrate que la ruta sea correcta
-                fit: BoxFit.contain, // Puedes cambiar esto según lo que necesites
+                'assets/imagenes/fondo2.png', // Asegúrate que la ruta sea correcta
+                fit: BoxFit.cover, // Puedes cambiar esto según lo que necesites
               ),
             ),
           ),
@@ -64,3 +80,4 @@ class Bienvenida extends StatelessWidget {
     );
   }
 }
+

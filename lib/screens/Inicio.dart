@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:proyecto/screens/Pelicula.dart';
 import 'package:proyecto/screens/Trailer.dart';
-import 'package:proyecto/screens/tmdb_service.dart';
+import 'package:proyecto/servicios/tmdb_service.dart';
 import 'package:proyecto/widgets/Mydrawer.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:proyecto/styles/styles.dart';
@@ -86,13 +87,19 @@ void mostrarDialogoPelicula(Map<String, dynamic> pelicula) async {
           child: Text("Ver Trailer", style: AppTextStyles.link),
         ),
         ElevatedButton(
-          style: AppButtonStyle.yellowButton,
-          onPressed: () {
-            Navigator.pop(context);
-            // lógica de Ver Ahora
-          },
-          child: Text("Ver Ahora"),
-        ),
+            style: AppButtonStyle.yellowButton,
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      Pelicula(titulo: titulo, descripcion: descripcion),
+                ),
+              );
+            },
+            child: Text("Ver Ahora"),
+          ),
       ],
     ),
   );

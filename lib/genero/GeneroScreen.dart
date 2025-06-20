@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:proyecto/screens/tmdb_service.dart';
+import 'package:proyecto/screens/Pelicula.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:proyecto/servicios/tmdb_service.dart';
 import 'package:proyecto/styles/styles.dart';
 import 'package:proyecto/widgets/Mydrawer.dart';
-import 'package:proyecto/screens/Trailer.dart'; 
+import 'package:proyecto/screens/Trailer.dart';
 
 class GeneroScreen extends StatefulWidget {
   final String titulo;
@@ -55,7 +56,9 @@ class _GeneroScreenState extends State<GeneroScreen> {
           TextButton(
             onPressed: () async {
               final tmdbService = TMDBService();
-              final trailerUrl = await tmdbService.getTrailerYoutubeUrl(pelicula['id']);
+              final trailerUrl = await tmdbService.getTrailerYoutubeUrl(
+                pelicula['id'],
+              );
 
               if (trailerUrl != null) {
                 Navigator.pop(context); // Cierra el diálogo
@@ -81,7 +84,7 @@ class _GeneroScreenState extends State<GeneroScreen> {
                       TextButton(
                         onPressed: () => Navigator.pop(context),
                         child: Text("Cerrar"),
-                      )
+                      ),
                     ],
                   ),
                 );
@@ -93,7 +96,13 @@ class _GeneroScreenState extends State<GeneroScreen> {
             style: AppButtonStyle.yellowButton,
             onPressed: () {
               Navigator.pop(context);
-              // lógica de Ver Ahora (opcional)
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) =>
+                      Pelicula(titulo: titulo, descripcion: descripcion),
+                ),
+              );
             },
             child: Text("Ver Ahora"),
           ),
@@ -113,7 +122,9 @@ class _GeneroScreenState extends State<GeneroScreen> {
       ),
       drawer: MyDrawer(parentContext: context),
       body: isLoading
-          ? Center(child: CircularProgressIndicator(color: AppColors.primaryYellow))
+          ? Center(
+              child: CircularProgressIndicator(color: AppColors.primaryYellow),
+            )
           : Padding(
               padding: const EdgeInsets.all(8.0),
               child: GridView.builder(
@@ -146,18 +157,29 @@ class _GeneroScreenState extends State<GeneroScreen> {
                           Expanded(
                             child: posterPath != null
                                 ? CachedNetworkImage(
-                                    imageUrl: 'https://image.tmdb.org/t/p/w500$posterPath',
+                                    imageUrl:
+                                        'https://image.tmdb.org/t/p/w500$posterPath',
                                     fit: BoxFit.cover,
                                     width: double.infinity,
-                                    placeholder: (context, url) =>
-                                        Center(child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primaryYellow)),
-                                    errorWidget: (context, url, error) =>
-                                        Icon(Icons.error, color: AppColors.textWhite),
+                                    placeholder: (context, url) => Center(
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        color: AppColors.primaryYellow,
+                                      ),
+                                    ),
+                                    errorWidget: (context, url, error) => Icon(
+                                      Icons.error,
+                                      color: AppColors.textWhite,
+                                    ),
                                   )
                                 : Container(
                                     color: Colors.grey[300],
                                     child: Center(
-                                      child: Icon(Icons.movie, size: 50, color: Colors.grey[600]),
+                                      child: Icon(
+                                        Icons.movie,
+                                        size: 50,
+                                        color: Colors.grey[600],
+                                      ),
                                     ),
                                   ),
                           ),
@@ -165,17 +187,24 @@ class _GeneroScreenState extends State<GeneroScreen> {
                             padding: const EdgeInsets.all(8.0),
                             child: Text(
                               titulo,
-                              style: AppTextStyles.subtitle.copyWith(fontSize: 16),
+                              style: AppTextStyles.subtitle.copyWith(
+                                fontSize: 16,
+                              ),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
                           if (releaseDate.isNotEmpty)
                             Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8.0,
+                              ),
                               child: Text(
                                 releaseDate,
-                                style: TextStyle(fontSize: 12, color: AppColors.textGrey),
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: AppColors.textGrey,
+                                ),
                               ),
                             ),
                         ],

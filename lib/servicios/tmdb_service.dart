@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 class TMDBService {
-  final String apiKey = '30c54da473ded1735c0a691c2778a035'; // Tu API Key de TMDB
+  final String apiKey = '30c54da473ded1735c0a691c2778a035'; 
   final String baseUrl = 'https://api.themoviedb.org/3';
 
   // Obtener películas populares
